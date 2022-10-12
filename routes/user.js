@@ -1,9 +1,10 @@
 // On imports les mudules
 const express = require("express");
-const router = express.Router(); // On créé un routeur avec la méthode Routeur() EXPRESS
 
 // On imports les fichier local.
-const userCtrl = require("../controllers/userCtrl");
+const userCtrl = require("../controllers/userLogs");
+
+const router = express.Router(); // On créé un routeur avec la méthode Routeur() EXPRESS
 
 // *********** Nous implémentons les routes pour **********
 
