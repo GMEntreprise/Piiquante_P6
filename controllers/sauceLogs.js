@@ -132,4 +132,99 @@ exports.deleteSauces = (req, res, next) => {
     });
 };
 
-/*************************** Likes/Dislikes Sauces *************/
+/*************************** Likes/ Dislikes Sauces *************/
+
+exports.addLikes = (req, res, next) => {
+  // Récuperer l'id dans l'url de la requête.
+  console.log("---------> CONTENU : req.params", req.params);
+
+  /*************  Ajouter son like. *********************/
+  // Mise au format de l'id pour pouvoir chercher l'objets correspondants
+
+  // Aller chercher l'objets dans la base de données.
+  Sauce.findOne({ _id: req.params.id })
+    .then((sauce) => {
+      // Si likes = 1, l'utilisateur aime
+      console.log("--------> CONTENU : RESULT de la promesse :", sauce);
+
+      console.log("--------_> CONTENU : req.body.likes", req.body.like);
+
+      // // Si le usersLiked est FALSE et si like === 1
+      if (!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
+        //   // // Mise à jours dans la Base de donnée
+        Sauce.updateOne(
+          { _id: req.params.id },
+
+          { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId } }
+        )
+          .then(() => res.status(201).json({ message: "Vous avez aimé +1" }))
+          .catch((error) => res.status(400).json({ error }));
+      }
+    })
+
+    .catch((error) => res.status(404).json({ error }));
+
+  /*************  Annuler son like. *********************/
+
+  // Aller chercher l'objets dans la base de données.
+  Sauce.findOne({ _id: req.params.id })
+    .then((sauce) => {
+      // Si likes = 1, l'utilisateur aime
+
+      if (sauce.usersLiked.includes(req.body.userId) && req.body.like === 0) {
+        // Mise à jours dans la Base de donnée
+        Sauce.updateOne(
+          { _id: req.params.id },
+
+          { $inc: { likes: -1 }, $pull: { usersLiked: req.body.userId } }
+        )
+          .then(() =>
+            res.status(201).json({ message: "Vous avez retirer votre like. 0" })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      }
+      /*************************** Ajouter un Dislikes   *************/
+
+      console.log("------> CONTENU DE req.body.disliked", req.body.like);
+      // like = -1 (dislike = +1)
+      if (
+        !sauce.usersDisliked.includes(req.body.userId) &&
+        req.body.like === -1
+      ) {
+        // Mise à jours dans la Base de donnée
+        Sauce.updateOne(
+          { _id: req.params.id },
+
+          {
+            $inc: { dislikes: 1 },
+            $push: { usersDisliked: req.body.userId },
+          }
+        )
+          .then(() => res.status(201).json({ message: "Dislike +1" }))
+          .catch((error) => res.status(400).json({ error }));
+      }
+
+      /*************************** Annuler un  Dislikes   *************/
+
+      if (
+        sauce.usersDisliked.includes(req.body.userId) &&
+        req.body.like === 0
+      ) {
+        // Mise à jours dans la Base de donnée
+        Sauce.updateOne(
+          { _id: req.params.id },
+
+          {
+            $inc: { dislikes: -1 },
+            $pull: { usersDisliked: req.body.userId },
+          }
+        )
+          .then(() => res.status(201).json({ message: "Dislike 0" }))
+          .catch((error) => res.status(400).json({ error }));
+      }
+    })
+
+    .catch((error) => res.status(404).json({ error }));
+
+  // Si likes = -1, l'utilisateur n'aime pas (= dislike) la sauce.
+};

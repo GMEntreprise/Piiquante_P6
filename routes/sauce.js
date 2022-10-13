@@ -28,5 +28,8 @@ router.put("/:id", checkAuth, multer, sauceCtrl.modifySauces);
 // On supprime les sauces.
 router.delete("/:id", checkAuth, sauceCtrl.deleteSauces);
 
+// Route pour ajouter des likes et dislikes
+router.post("/:id/like", checkAuth, sauceCtrl.addLikes);
+
 //  On imports le fichier pour qu'il soit disponible partout.
 module.exports = router;
